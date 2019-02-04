@@ -1,0 +1,54 @@
+version: '3'
+
+services:
+    indexer-php:
+        image: brouzie/php:7.2
+        container_name: indexer-php
+        links:
+            - indexer-elasticsearch
+            - indexer-mysql
+        depends_on:
+            - indexer-elasticsearch
+            - indexer-mysql
+        hostname: indexer-php
+        volumes:
+            - composer-cache-volume:/home/dev/.composer/cache
+            - web-data-volume:/var/www/html
+        environment:
+            PASSWORD: 112233
+
+    indexer-elasticsearch:
+        image: docker.elastic.co/elasticsearch/elasticsearch:6.6.0
+        container_name: indexer-elasticsearch
+        hostname: indexer-elasticsearch
+        environment:
+            - cluster.name=docker-cluster
+            - bootstrap.memory_lock=true
+            - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+        ulimits:
+            memlock:
+                soft: -1
+                hard: -1
+        volumes:
+            - elasticsearch-data-volume:/usr/share/elasticsearch/data
+
+    indexer-mysql:
+        image: percona/percona-server:5.7
+        container_name: indexer-mysql
+        hostname: indexer-mysql
+        environment:
+            MYSQL_ROOT_PASSWORD: indexer
+            MYSQL_USER: indexer
+            MYSQL_PASSWORD: indexer
+            MYSQL_DATABASE: indexer
+        volumes:
+            - mysql-data-volume:/var/lib/mysql
+        command:
+            - '--sql-mode=NO_AUTO_VALUE_ON_ZERO --innodb-file-per-table --innodb-strict-mode=off'
+
+volumes:
+    web-data-volume:
+    elasticsearch-data-volume:
+    mysql-data-volume:
+    composer-cache-volume:
+        external: true
