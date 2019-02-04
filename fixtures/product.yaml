@@ -1,0 +1,9 @@
+App\Entity\Product:
+    product_{1..5000}:
+        __construct: ['<ean13()>']
+        __calls:
+            -   addOffer (50%?): ['<offer()>']
+            -   addOffer (40%?): ['<offer()>']
+            -   addOffer (30%?): ['<offer()>']
+            -   addOffer (20%?): ['<offer()>']
+            -   addOffer (10%?): ['<offer()>']
