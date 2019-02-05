@@ -25,6 +25,11 @@ class Product
     private $ean;
 
     /**
+     * @ORM\Column(type="datetime_immutable")
+     */
+    private $updatedAt;
+
+    /**
      * @ORM\OneToMany(targetEntity="App\Entity\Offer", mappedBy="product", cascade={"persist"})
      *
      * @var Collection|Offer[]
@@ -35,11 +40,18 @@ class Product
     {
         $this->ean = $ean;
         $this->offers = new ArrayCollection();
+        $this->updatedAt = new \DateTimeImmutable();
     }
 
     public function addOffer(Offer $offer): void
     {
         $offer->setProduct($this);
         $this->offers->add($offer);
+        $this->updatedAt = new \DateTimeImmutable();
+    }
+
+    public function getId(): int
+    {
+        return $this->id;
     }
 }

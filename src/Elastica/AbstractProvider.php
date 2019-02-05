@@ -17,12 +17,12 @@ abstract class AbstractProvider implements PagerProviderInterface
 
     protected $options;
 
-    public function __construct(EntityManagerInterface $em, string $entity, array $options = [])
+    public function __construct(EntityManagerInterface $em, string $entityClass, array $options = [])
     {
         $this->em = $em;
         $this->options = array_replace(
             [
-                'entity' => $entity,
+                'entity_class' => $entityClass,
                 'query_builder_method_name' => 'createQueryBuilder',
                 'hydration_mode' => AbstractQuery::HYDRATE_ARRAY,
                 'query_builder_method_args' => ['entity'],
@@ -93,7 +93,7 @@ abstract class AbstractProvider implements PagerProviderInterface
         return array_column($result, '_id');
     }
 
-    public function getByIds(array $ids): iterable
+    public function getByIds(array $ids): array
     {
         $queryBuilder = $this->getQueryBuilder();
         $queryBuilder
@@ -136,7 +136,7 @@ abstract class AbstractProvider implements PagerProviderInterface
 
     private function getQueryBuilder(): QueryBuilder
     {
-        $repository = $this->em->getRepository($this->options['entity']);
+        $repository = $this->em->getRepository($this->options['entity_class']);
         $method = $this->options['query_builder_method_name'];
 
         return $repository->$method(...$this->options['query_builder_method_args']);
