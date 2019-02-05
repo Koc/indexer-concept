@@ -1,6 +1,31 @@
+services:
+    app.elastica.index_provider.product:
+        class: App\Elastica\ProductProvider
+        public: true
+        arguments:
+            - '@doctrine.orm.entity_manager'
+            - App\Entity\Product
+        tags:
+            - { name: fos_elastica.pager_provider, index: product, type: product }
+
 # Read the documentation: https://github.com/FriendsOfSymfony/FOSElasticaBundle/blob/master/Resources/doc/setup.md
 fos_elastica:
     clients:
-        default: { host: localhost, port: 9200 }
+        default: { host: '%env(resolve:ES_HOST)%', port: '%env(resolve:ES_PORT)%' }
     indexes:
-        app: ~
+        product:
+            types:
+                product:
+                    properties:
+                        ean: ~
+                        offers:
+                            type: nested
+                            properties:
+                                id: {type: integer}
+                                price: {type: integer}
+                                companyName: ~
+                    persistence:
+                        driver: orm
+                        model: App\Entity\Product
+                        provider:
+                            service: app.elastica.index_provider.product

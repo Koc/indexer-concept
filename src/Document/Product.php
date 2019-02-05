@@ -6,17 +6,17 @@ class Product
 {
     private $id;
 
-    private $name;
+    private $ean;
 
     private $offers;
 
     /**
      * @param Offer[] $offers
      */
-    public function __construct(int $id, string $name, array $offers)
+    public function __construct(int $id, string $ean, array $offers)
     {
         $this->id = $id;
-        $this->name = $name;
+        $this->ean = $ean;
         $this->offers = $offers;
     }
 
@@ -25,9 +25,9 @@ class Product
         return $this->id;
     }
 
-    public function getName(): string
+    public function getEan(): string
     {
-        return $this->name;
+        return $this->ean;
     }
 
     /**
