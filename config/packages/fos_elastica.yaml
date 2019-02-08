@@ -8,14 +8,16 @@ services:
         tags:
             - { name: fos_elastica.pager_provider, index: product, type: product }
 
-    app.elastica.model_to_elastica_transformer.product:
-        class: App\Elastica\ModelToElasticaProviderTransformer
-        decorates: fos_elastica.model_to_elastica_transformer.product.product
+    app.elastica.indexer.product:
+        class: App\Elastica\Indexer
         arguments:
-            - '@app.elastica.model_to_elastica_transformer.product.inner'
             - '@app.elastica.index_provider.product'
-            - App\Entity\Product
-            - getId
+            - '@fos_elastica.object_persister.product.product'
+
+    App\Job\ReindexChangedProducts:
+        arguments:
+            - '@doctrine.orm.entity_manager'
+            - '@app.elastica.indexer.product'
 
 # Read the documentation: https://github.com/FriendsOfSymfony/FOSElasticaBundle/blob/master/Resources/doc/setup.md
 fos_elastica:
@@ -30,11 +32,13 @@ fos_elastica:
                         offers:
                             type: nested
                             properties:
-                                id: {type: integer}
-                                price: {type: integer}
+                                id: { type: integer }
+                                price: { type: integer }
                                 companyName: ~
                     persistence:
                         driver: orm
                         model: App\Entity\Product
+                        listener:
+                            enabled: false
                         provider:
                             service: app.elastica.index_provider.product
